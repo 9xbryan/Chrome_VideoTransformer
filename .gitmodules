@@ -1,0 +1,3 @@
+[submodule "lib/monkeypatch_prototypes"]
+	path = lib/monkeypatch_prototypes
+	url = git@github.com:9xbryan/JSLib_monkeypatch.git
