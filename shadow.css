@@ -1,0 +1,65 @@
+* {
+	line-height: 2.05vmax;
+	font-family: Roboto, Geneva, Verdana, sans-serif;
+	font-size: 2vmax;
+}
+*.transform-show_recentChange {
+	line-height: 5.1vmax;
+	font-size: 5vmax;
+}
+#controller {
+	position: relative;
+	background-color: rgba(1, 1, 36, 0.5);
+	color: white;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 0.4vmax 0.4vmax 0.4vmax 0.6vmax;
+	z-index: 2147483647;
+	opacity: 0.5;
+}
+#controller.transform-show_recentChange {
+	background-color: rgba(1, 1, 36, 1);
+	color: white;
+	opacity: 1;
+}
+#controller:hover {
+	opacity: 1;
+}
+#controller:hover > .draggable {
+	background-color: rgba(1, 1, 36, 1);
+	opacity: 1;
+}
+#controls {
+	display: inline;
+}
+#controller.dragging, .draggable:active  {
+	cursor: -webkit-grabbing;
+	opacity: 1;
+}
+.draggable {
+	cursor: -webkit-grab;
+}
+button {
+	cursor: pointer;
+	color: white;
+	background-color: rgba(1, 1, 36, 0.3);
+	border-radius: 0.8vmax; /* 5px;*/
+	padding: 0.2vmax 0.8vmax 0.4vmax 0.8vmax; /* 1px 6px 3px 6px;*/
+	line-height: 1.4vmax; /*14px;*/
+	border: 0.2vmax solid rgba(1, 1, 36, 0.3);
+	font-family: Roboto, 'Lucida Console', Monaco, monospace;
+}
+button:focus {
+	outline: 0;
+}
+button:hover {
+	opacity: 1;
+	background-color: rgba(1, 1, 36, 1);
+}
+button:active {
+	background: #ccc;
+	color: rgba(1, 1, 36, 1);
+}
+button.hideButton {
+	opacity: 0.5;
+}
