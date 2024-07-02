@@ -49,7 +49,8 @@
 				"transformer.css",
 				"shadow.css",
 				"lib/monkeypatch_prototypes/monkeypatch.mjs",
-				"lib/monkeypatch_prototypes/monkeypatch_DOM.mjs"
+				"lib/monkeypatch_prototypes/monkeypatch_DOM.mjs",
+				"modifyVideoPrototypeForTransform.mjs"
 			],
 			"matches": ["http://*/*", "https://*/*", "file:///*"]
 		}

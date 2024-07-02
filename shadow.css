@@ -1,65 +1,158 @@
+
+@import url('https://fonts.googleapis.com/css?family=Rubik:300,400,500');
+
+
+
 * {
 	line-height: 2.05vmax;
-	font-family: Roboto, Geneva, Verdana, sans-serif;
+	font-family: Rubik, Roboto, Geneva, Verdana, sans-serif;
 	font-size: 2vmax;
 }
-*.transform-show_recentChange {
+*:focus {
+	outline: none;
+}
+body {
+	overflow: hidden; /* Hide scrollbars */
+	overflow-y: hidden; /* Hide vertical scrollbar */
+	overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+.shelf {
+	transition: all 2s, color 1s;
+	visibility:hidden;
+	display:none;
+	position:absolute;
+	left:110%;
+	opacity: 0;
+}
+.shelf.out {
+	display: grid;
+	visibility:visible;
+	left:50%;
+	transform: translate(-50%);
+	opacity:1;
+background-color: rgba(1, 1, 36, .6);
+	color: white;
+	border-radius: 4px;
+	opacity: 0.3;
+	width: min(40rem, 30vmax, 100%);
+	box-shadow: 0 0 2rem 0 #0001;
+	font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont,
+		'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+		'Helvetica Neue', sans-serif;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+	grid-template-areas:
+	"stretch fit fill escape"
+	"experiment2 flipX flipY experiment8"
+	"experiment3 expandVP shrinkVP experiment9"
+	"hideOnPause experiment7 experiment experiment10"
+	"experiment4 experiment5 experiment6 autoTransformFit";
+	padding: 0.5rem;
+	gap: 5px;
+}
+
+/* #container, form {
+	display: grid;
+	cursor: -webkit-grab;
+	color: white;
+	border-radius: 4px;
+	opacity: 0.3;
+	width: min(40rem, 30vmax, 100%);
+	box-shadow: 0 0 2rem 0 #0001;
+	font-family: 'Rubik', system-ui, -apple-system, BlinkMacSystemFont,
+		'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+		'Helvetica Neue', sans-serif;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+	grid-template-areas:
+	"stretch fit fill escape"
+	"experiment2 flipX flipY experiment8"
+	"experiment3 expandVP shrinkVP experiment9"
+	"hideOnPause experiment7 experiment experiment10"
+	"experiment4 experiment5 experiment6 autoTransformFit";
+	padding: 0.5rem;
+	gap: 5px;
+} */
+
+.transform-show_recentChange {
+	background-color: rgba(1, 1, 36, 1);
+	color: white;
+	opacity: 1;
 	line-height: 5.1vmax;
 	font-size: 5vmax;
 }
-#controller {
-	position: relative;
-	background-color: rgba(1, 1, 36, 0.5);
+#container:hover, form:hover {
 	color: white;
-	border-radius: 5px;
-	padding: 5px;
-	margin: 0.4vmax 0.4vmax 0.4vmax 0.6vmax;
-	z-index: 2147483647;
-	opacity: 0.5;
-}
-#controller.transform-show_recentChange {
-	background-color: rgba(1, 1, 36, 1);
-	color: white;
-	opacity: 1;
-}
-#controller:hover {
-	opacity: 1;
-}
-#controller:hover > .draggable {
-	background-color: rgba(1, 1, 36, 1);
-	opacity: 1;
-}
-#controls {
-	display: inline;
-}
-#controller.dragging, .draggable:active  {
-	cursor: -webkit-grabbing;
 	opacity: 1;
 }
 .draggable {
 	cursor: -webkit-grab;
 }
-button {
+.draggable:active, .dragging, form:active, #container:active {
+	cursor: -webkit-grabbing;
+}
+button, DIV.button {
 	cursor: pointer;
 	color: white;
-	background-color: rgba(1, 1, 36, 0.3);
-	border-radius: 0.8vmax; /* 5px;*/
-	padding: 0.2vmax 0.8vmax 0.4vmax 0.8vmax; /* 1px 6px 3px 6px;*/
-	line-height: 1.4vmax; /*14px;*/
-	border: 0.2vmax solid rgba(1, 1, 36, 0.3);
+	background-color: rgba(1, 1, 36, 0.4);
+	border-radius: min(0.8vmax, 4px);
+	padding: 1px 6px 3px 6px;
+	line-height: min(1.4vmax, 14px);
 	font-family: Roboto, 'Lucida Console', Monaco, monospace;
+	opacity: 0.4;
+	text-align: center;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: background-color 0.5s, transform 0.5s;
+	width:100%;
 }
-button:focus {
-	outline: 0;
+DIV.button * {
+	cursor: inherit;
+	color: inherit;
+	text-transform: inherit;
+	text-decoration: inherit;
+	text-align: inherit;
+	background-color: inherit;
+	font-size: inherit;
+	background-color:rgba(1,1,36,0.2);
+	opacity:0.8;
 }
-button:hover {
+button:hover, DIV.button:hover {
+	transform: scale(1.1);
 	opacity: 1;
-	background-color: rgba(1, 1, 36, 1);
+	background-color: rgba(1, 1, 36, 0.7);
+	box-shadow: 3px 3px greenyellow;
 }
-button:active {
-	background: #ccc;
-	color: rgba(1, 1, 36, 1);
+button:active, DIV.button:active {
+	background-color: #387bd8;
+	color: rgba(0, 0, 0, 1);
+	opacity:1;
+	box-shadow: 3px 3px red;
 }
-button.hideButton {
-	opacity: 0.5;
+button.hideButton, DIV.button.hideButton {
+	opacity: 0.2;
+}
+
+input[type="checkbox"] {
+	margin:0;
+	display:inline;
+}
+label {
+	margin:1px;
+}
+
+.hidden {
+	display: none;
+}
+.show {
+	display: inline-block;
+}
+
+#trigger {
+	position: absolute;
+	top:3rem;
+	right:0px;
+	max-width: 100px;
 }

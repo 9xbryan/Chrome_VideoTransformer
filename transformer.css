@@ -14,7 +14,7 @@ body.transform {
 	z-index: 99999999 !important;
 	margin: 0 !important;
 	padding: 0 !important;
-	background-color: rgba(1, 1, 36, .75);
+	background-color: rgba(1, 1, 36, .85);
 }
 DIV.ytp-chrome-bottom.transform {
 	width: 100% !important;
@@ -49,4 +49,12 @@ DIV.ytp-chrome-bottom.transform {
 .ytp-autohide .transform-show {
 	visibility: visible;
 	opacity: 1;
+}
+
+.ytp-autohide.hideControlsWhenPaused, .ytp-autohide .hideControlsWhenPaused, .hideControlsWhenPaused {
+	display:none;
+	visibility: hidden;
+	/* visibility:visible; */
+	transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	opacity: 0;
 }
