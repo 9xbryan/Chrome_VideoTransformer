@@ -1,0 +1,29 @@
+<html>
+	<style>
+		@import "shadow.css";
+		</style>
+		<script type='text/javascript' src='shadow.js'></script>
+	<body class=''>
+		<form id="container" data-action="drag" class="shelf" >
+				<button data-action='transform' data-value="fit" style="grid-area: fit">fit<br>(  )</button>
+				<button data-action='transform' data-value="fill" style="grid-area: fill">fill<br>(  )</button>
+				<button data-action='transform' data-value="stretch" style="grid-area: stretch">stretch<br>(  )</button>
+				<button data-action='flip' data-value="X" style="grid-area: flipX">flip X<br>(  )</button>
+				<button data-action='flip' data-value="Y" style="grid-area: flipY">flip Y<br>(  )</button>
+				<button data-action='updateViewport' data-value="shrink" style="grid-area: shrinkVP">shrink<br>Win (  )</button>
+				<button data-action='updateViewport' data-value="expand" style="grid-area: expandVP">expand<br>Win (  )</button>
+			<div class="button" style="grid-area: hideOnPause; width:85%; height:90%">
+				<input type="checkbox" id="hideControlsWhenPaused" >
+				<label for="hideControlsWhenPaused">hide controls<br>when paused</label>
+			</div>
+				<button data-action='transform' data-value="escape" style="grid-area: escape">Escape<br>(  )</button>
+				<button data-action="experiment" data-value="default" style="grid-area: experiment">experiment<br>(  )</button>
+				<button data-action="experiment" data-value="2" style="grid-area: experiment2">experiment 2<br>(  )</button>
+				<button data-action="experiment" data-value="3" style="grid-area: experiment3">experiment 3<br>(  )</button>
+				<button data-action="experiment" data-value="4" style="grid-area: experiment4">experiment<br>(  )</button>
+				<button data-action="experiment" data-value="5" style="grid-area: experiment5">experiment 5<br>(  )</button>
+				<button data-action="experiment" data-value="6" style="grid-area: experiment6">experiment 6<br>(  )</button>
+		</form>
+		<button id="trigger">trigger</button>
+	</body>
+</html>
