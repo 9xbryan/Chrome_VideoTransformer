@@ -31,7 +31,7 @@ body {
 	left:50%;
 	transform: translate(-50%);
 	opacity:1;
-background-color: rgba(1, 1, 36, .6);
+/* background-color: rgba(1, 1, 36, .6); */
 	color: white;
 	border-radius: 4px;
 	opacity: 0.3;
@@ -50,6 +50,8 @@ background-color: rgba(1, 1, 36, .6);
 	"experiment4 experiment5 experiment6 autoTransformFit";
 	padding: 0.5rem;
 	gap: 5px;
+	/* transition: background-color 0.5s, transform 0.5s !important; */
+	transition: all 2s, color 1s;
 }
 
 /* #container, form {
@@ -81,6 +83,7 @@ background-color: rgba(1, 1, 36, .6);
 	opacity: 1;
 	line-height: 5.1vmax;
 	font-size: 5vmax;
+	transition: all 2s, color 1s;
 }
 #container:hover, form:hover {
 	color: white;
@@ -120,7 +123,7 @@ DIV.button * {
 	opacity:0.8;
 }
 button:hover, DIV.button:hover {
-	transform: scale(1.1);
+	transform: scale(1.1)  translate(-6px);
 	opacity: 1;
 	background-color: rgba(1, 1, 36, 0.7);
 	box-shadow: 3px 3px greenyellow;
@@ -133,6 +136,7 @@ button:active, DIV.button:active {
 }
 button.hideButton, DIV.button.hideButton {
 	opacity: 0.2;
+	transition: all 2s, color 1s;
 }
 
 input[type="checkbox"] {
@@ -145,9 +149,11 @@ label {
 
 .hidden {
 	display: none;
+	transition: all 2s, color 1s;
 }
 .show {
 	display: inline-block;
+	transition: all 2s, color 1s;
 }
 
 #trigger {
@@ -155,4 +161,8 @@ label {
 	top:3rem;
 	right:0px;
 	max-width: 100px;
+	width: fit-content;
+}
+#trigger:hover {
+	transform: scale(1.1) translateX(-6px);
 }

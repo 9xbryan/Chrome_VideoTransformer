@@ -3,8 +3,8 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 	[ 'consoleColors', 'stringify', 'is', 'defer' ].forEach( patch => monkeypatch[ patch ]() );
 	import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch_DOM.mjs" ) ).then( monkeypatch_DOM => {
 		[ 'ShadowRootTraverse', 'eventListeners', 'preventDefault', 'keyboardEventProperties', 'patchingHTMLElements' ].forEach( patch => monkeypatch_DOM[ patch ]() );
-		import( browser.runtime.getURL( "./modifyVideoPrototypeForTransform.mjs" ) ).then(async videoModules => {
-			[ 'Media' ].forEach( patch => videoModules[patch]());
+		import( browser.runtime.getURL( "./modifyVideoPrototypeForTransform.mjs" ) ).then( async videoModules => {
+			[ 'Media' ].forEach( patch => videoModules[ patch ]() );
 
 
 			var regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
@@ -16,13 +16,13 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 				return {
 					count: 0, initialized: false,
 					settings: {
-						autoTransformFitWhenPlay: true,
+						autoTransformFitWhenPlay: false,
+						autoTransformWhenPlay: 'fit',
 						enabled: true, // default enabled
-						displayKey: 'u', // default: u
 						imageBoolean: false, // default: false
 						startHidden: false, // default: false
 						controllerOpacity: 0.3, // default: 0.3
-						hideControlsWhenPaused: true,
+						hideControlsWhenPaused: false,
 						blacklist: `\
 					www.instagram.com
 					twitter.com
@@ -39,7 +39,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'right',
 								force: false,
 								predefined: true,
-								execute: untransformPlayer
 							}, {
 								action: 'fixedEdge',
 								keyCode: 65, //keyCode
@@ -48,7 +47,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'left',
 								force: false,
 								predefined: true,
-								execute: untransformPlayer
 							}, {
 								action: 'fixedEdge',
 								keyCode: 81, //keyCode
@@ -57,7 +55,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'top',
 								force: false,
 								predefined: true,
-								execute: untransformPlayer
 							}, {
 								action: 'fixedEdge',
 								keyCode: 90, //keyCode
@@ -66,7 +63,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'bottom',
 								force: false,
 								predefined: true,
-								execute: untransformPlayer
 							}, {
 								action: 'transform',
 								keyCode: 27, //keyCode
@@ -75,7 +71,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'escape',
 								force: false,
 								predefined: true,
-								execute: untransformPlayer
 							}, {
 								action: 'transform',
 								keyCode: 71, //keyCode
@@ -84,7 +79,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'fit',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
 							}, {
 								action: 'transform',
 								keyCode: 72, //keyCode
@@ -93,7 +87,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'fill',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
 							}, {
 								action: 'transform',
 								keyCode: 83, //keyCode
@@ -110,7 +103,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'Y',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
 							}, {
 								action: 'flip',
 								keyCode: 88, //keyCode
@@ -119,16 +111,14 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'X',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
 							}, {
 								action: 'updateViewport',
 								keyCode: 82, //keyCode
 								code: `KeyR`, //physical key, not referenced with mod keys
 								key: `r`,
-								value: 'reduce',
+								value: 'shrink',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
 							}, {
 								action: 'updateViewport',
 								keyCode: 69, //keyCode
@@ -137,7 +127,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'expand',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
 							}, {
 								action: "experiment",
 								keyCode: 84, //keyCode
@@ -146,7 +135,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'default',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
 							}, {
 								action: "display",
 								keyCode: 85,
@@ -155,7 +143,14 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 								value: 'controls',
 								force: false,
 								predefined: true,
-								execute: transformPlayer
+							}, {
+								action: "display",
+								keyCode: 66,
+								code: `KeyB`,
+								key: 'b',
+								value: 'trigger', //also show/hide trigger button + controls
+								force: false,
+								predefined: true,
 							} ]
 					}
 				};
@@ -175,16 +170,16 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 
 				try {
 					await initStorageCache
-				} catch (e) {
+				} catch ( e ) {
 					//handle error here
 				}
 
-				if (!storageCache.initialized) {
+				if ( !storageCache.initialized ) {
 					console.red( 'storageCache NOT initialized' );
 					setTimeout( initializeStorage, 1000 );
-				}  else {
+				} else {
 					storageCache.settings.enabled = true;
-					initializeWhenReady(document);
+					initializeWhenReady( document );
 				}
 			}
 
@@ -194,10 +189,10 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 				async set( target, property, value ) {
 					console.redBg( `Property ${ property } changed to ${ value }` );
 					target[ property ] = value;
-					return STORAGE.set( {[property]:value} );
+					return STORAGE.set( { [ property ]: value } );
 				},
 			}
-			const settings = new Proxy(storageCache.settings, storageProxyHandler);
+			const settings = new Proxy( storageCache.settings, storageProxyHandler );
 
 			// green: new initial values:
 
@@ -218,7 +213,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 						let keyedItem = shadowRootContainer?.shadowRoot.querySelector( `#` + key );
 						if ( keyedItem ) {
 							keyedItem.checked = newValue;
-							console.greenBg(`updated UI for memory change;`)
+							console.greenBg( `updated UI for memory change;` )
 						}
 					} else {
 						console.log( 'ERROR: something might be wrong' );
@@ -237,30 +232,32 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 			}
 
 			const tc = {
-/**
- * some of these are currently not being used right now.
- */
+
 				states: { //session-based. doesn't need to be synced
 					flippedState: false,
 					transformedState: false, // possible states: [false, 'fill', 'fit', 'fill same orientation']
 					flipped: false,
-						transformed: false
+					transformed: false
 				},
+				/**
+				 * some of these are currently not being used right now.
+				 */
+
 				shadowRootHosts: [],
 				transformed: {
 					states: {},
-					videoContainer:null,
-					video:null,
-					scaleX:null,
-					scaleY:null,
-					translateX:null,
-					translateY:null,
+					videoContainer: null,
+					video: null,
+					scaleX: null,
+					scaleY: null,
+					translateX: null,
+					translateY: null,
 					style: {
 						left: null,
-						top:null,
-						width:null,
-						height:null,
-						transform:null
+						top: null,
+						width: null,
+						height: null,
+						transform: null
 					}
 				},
 				untransformed: {
@@ -268,21 +265,24 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 						left: null,
 						top: null,
 						width: null,
-						height:null,
-						transform:null
+						height: null,
+						transform: null
 					}
 				},
-				transform:{}
+				transform: {},
+				eventTracker: {
+					mousedown: false,
+					resizing: false,
+					mouseup: false,
+				}
 			};
-			function videoListeners(e) {
-				const {type, target:video} = e;
-				if (!video || video.nodeName !== 'VIDEO') return;
-
+			function videoListeners( e ) {
+				const { type, target: video } = e;
+				if ( !video || video.nodeName !== 'VIDEO' ) return;
 				let controller;
-				let classesToRemove = ['playing', 'paused', 'waiting', 'ended', 'emptied', 'suspend', 'stalled', 'loadedmetadata', 'loadeddata', 'canplay'];
-				let idx = classesToRemove.indexOf( type );
-				if ( idx != -1 ) classesToRemove.splice( idx, 1 );
-				switch (type) {
+				let classesToRemove = [ 'playing', 'paused', 'waiting', 'ended', 'emptied', 'suspend', 'stalled', 'loadedmetadata', 'loadeddata', 'canplay' ];
+				video.classList.remove( ...classesToRemove );
+				switch ( type ) {
 					case 'play':
 					case 'playing':
 						if ( !video.transform ) video.transform = new tc.transformController( video );
@@ -290,42 +290,32 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 							controller = video.transform.div;
 							if ( controller.classList.contains( "transform-nosource" ) ) controller.classList.remove( "transform-nosource" );
 						}
-						Array.from(video.ownerDocument.querySelectorAll( `.hideControlsWhenPaused` )).forEach( element =>
-							element.classList.remove( 'hideControlsWhenPaused' )
-						)
-						updateControllerCoordinatesWhenUntransformed(video);
-						video.classList.remove( ...classesToRemove );
-						video.classList.add('playing');
-						if ( settings.autoTransformFitWhenPlay ) {
-							tc.states.transformed = 'fit';
-							transformPlayer( video, 'fit' );
-						}
-						console.purple( `PLAY videoListeners() event: "${ type }"` );
+						Array.from( video.ownerDocument.querySelectorAll( `.hideControlsWhenPaused` ) ).forEach( element => element.classList.remove( 'hideControlsWhenPaused' ) )
+						updateControllerCoordinatesWhenUntransformed( video );
+						video.classList.add( 'playing' );
+						if ( settings.autoTransformFitWhenPlay ) transformPlayer( video, tc.states.transformed || 'fit' );
 						break;
 					case 'pause':
 						updateControllerCoordinatesWhenUntransformed( video );
-						video.classList.remove( ...classesToRemove );
-						video.classList.add('paused');
-						hideControlsWhenPaused(video);
-						console.purple( `PAUSE videoListeners() event: "${ type }"` );
+						video.classList.add( 'paused' );
+						hideControlsWhenPaused( video );
 						break;
 					default:
-						console.violet(`default videoListeners() event: "${type}"`);
-						video.classList.remove( ...classesToRemove );
 						video.classList.add( type );
 				}
 			}
-			function hideControlsWhenPaused(video) {
-				console.log('hideControlsWhenPaused(video)')
+			function hideControlsWhenPaused( video ) {
+				// console.log('hideControlsWhenPaused(video)')
 				const doc = video ? video.ownerDocument : document;
+				// const layer = parseInt(element.dataset.layer);
 				if ( settings.hideControlsWhenPaused ) {
-					Array.from( doc.querySelectorAll( `ytd-player#ytd-player *[data-layer]` )).forEach( element => {
-						if ( parseInt(element.dataset.layer) > 0 ) element.classList.add( 'hideControlsWhenPaused' );
+					Array.from( doc.querySelectorAll( `ytd-player#ytd-player *[data-layer]` ) ).forEach( element => {
+						if ( parseInt( element.dataset.layer ) > 0 ) element.classList.add( 'hideControlsWhenPaused' );
 					} );
 				} else {
-					Array.from( doc.querySelectorAll(`.hideControlsWhenPaused`)).forEach( element => {
-						if ( parseInt(element.dataset.layer) > 0 ) element.classList.remove( 'hideControlsWhenPaused' );
-					} )
+					Array.from( doc.querySelectorAll( `.hideControlsWhenPaused` ) ).forEach( element => {
+						if ( parseInt( element.dataset.layer ) > 0 ) element.classList.remove( 'hideControlsWhenPaused' );
+					} );
 				}
 			}
 
@@ -349,7 +339,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 					this.video = target;
 					this.parent = target.parentElement || parent;
 					this.div = this.initializeControls();
-					['play', 'playing', 'pause', 'waiting', 'ended', 'emptied', 'suspend', 'stalled', 'loadedmetadata', 'loadeddata', 'canplay' ].forEach(eventType => target.addEventListener(eventType, videoListeners));
+					[ 'play', 'playing', 'pause', 'waiting', 'ended', 'emptied', 'suspend', 'stalled', 'loadedmetadata', 'loadeddata', 'canplay' ].forEach( eventType => target.addEventListener( eventType, videoListeners ) );
 					var observer = new MutationObserver( mutations => {
 						mutations.forEach( mutation => {
 							if ( mutation.type === "attributes" && ( mutation.attributeName === "src" || mutation.attributeName === "currentSrc" ) ) {
@@ -359,14 +349,12 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 							}
 						} );
 					} );
-					observer.observe( target, {
-						attributeFilter: [ "src", "currentSrc" ]
-					} );
+					observer.observe( target, { attributeFilter: [ "src", "currentSrc" ] } );
 				};
 				tc.transformController.prototype.remove = function () {
 					this?.div.remove();
 					delete this.video.transform;
-					let idx = cachedMediaElements.indexOf( this.video );
+					const idx = cachedMediaElements.indexOf( this.video );
 					if ( idx != -1 ) cachedMediaElements.splice( idx, 1 );
 				};
 				tc.transformController.prototype.initializeControls = function () {
@@ -483,14 +471,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 					e.stopPropagation(); e.preventDefault(); e.stopImmediatePropagation();
 				}
 				switch ( trg.nodeName ) {
-					case 'BUTTON':
-						if ( trg.id === 'trigger' ) {
-							let shelf = document.getElementById( 'container' );
-							return shelf.classList.toggle( 'out' );
-						}
-						const { action, value } = trg.dataset;
-						run( action, value, e );
-						break;
+					case 'BUTTON': triggerHandler.bind( trg )( e ); break;
 					case 'DIV':
 						if ( trg.classList.contains( 'button' ) ) {
 							let input = trg.querySelector( 'input[type="checkbox"]' );
@@ -500,6 +481,20 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 							e.preventDefault();
 						} break;
 				}
+			}
+			function triggerHandler( e ) {
+				const trg = this ?? e.target;
+				if ( trg.id === 'trigger' ) {
+					let shelf = trg.ownerDocument.getElementById( 'container' );
+					shelf.classList.toggle( 'out' );
+					// trg.ownerDocument.getElementById( 'container' )?.classList.toggle( 'out' );
+					trg.textContent = shelf.classList.contains( 'out' ) ? 'show' : 'hide';
+					return;
+
+					// return shelf.classList.toggle( 'out' );
+				}
+				const { action, value } = trg.dataset;
+				run( action, value, e );
 			}
 			function isBlacklisted() {
 				let blacklisted = false;
@@ -538,14 +533,14 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 					return str.replace( escapeChar, "\\$&" );
 				}
 			}
-			function refreshCoolDown() {
+			function refreshCoolDown( time ) {
 				if ( refreshCoolDown.timer ) clearTimeout( refreshCoolDown.timer );
-				refreshCoolDown.timer = setTimeout( () => { refreshCoolDown.timer = false }, 1000 );
+				refreshCoolDown.timer = setTimeout( () => { refreshCoolDown.timer = false }, time || 1000 );
 			} refreshCoolDown.timer = false;
 			function setupListeners( e ) {
 				/**
 				 * This function is run whenever a video speed rate change occurs.
-				 * It is used to update the speed that shows up in the display as well as save
+				 * It is used to update the speed that shows up in the display as well as save1
 				 * that latest speed into the local storage.
 				 * @param {*} video The video element to update the speed indicators for.
 				 */
@@ -556,10 +551,37 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 						if ( document.readyState === 'complete' ) loadHandler( e );
 					} );
 				}
-				window.addEventListener( 'resize', windowResizeHandler );
-				window.addEventListener( 'transitionend', transitionendHandler );
+				// ['mousedown', 'mouseup', 'click'].forEach(mouseEvent => {
+				// 	window.addEventListener( mouseEvent, mouseHandler);
+				// })
+				// window.addEventListener( 'resize', windowResizeHandler );
+				// window.addEventListener( 'transitionend', transitionendHandler );
 				window.addEventListener( 'fullscreenchange', fullscreenchangeHandler );
+
+				const resizeObserver = new ResizeObserver( resizeObserverHandler );
+				resizeObserver.observe( document.documentElement );
 			}
+			async function resizeObserverHandler( entries ) {
+				/**
+				 * this new API is more efficient than the 'resize' event;
+				 */
+				for ( const entry of entries ) {
+					// Do something with the entry
+					let { width, left } = entry.contentRect;
+					console.green( `bodyWidth: ${ width }px` );
+					tc.eventTracker.resizing = true;
+					restoreTransformedPlayer( entry.target?.querySelector( `ytd-player video` ) );
+					if ( resizeObserverHandler.readyToExecute ) {
+						resizeObserverHandler.readyToExecute = false;
+						console.greenBg( `bodyWidth: ${ width }px` );
+						if ( resizeObserverHandler.coolTimer ) clearTimeout( resizeObserverHandler.coolTimer )
+						resizeObserverHandler.coolTimer = setTimeout( () => resizeObserverHandler.readyToExecute = true, 1500 );
+					}
+
+				}
+
+				return true;
+			} resizeObserverHandler.readyToExecute = true;
 			async function loadHandler( e ) {
 				document.documentElement.classList.add( `transformLoaded` );
 				// await browser.runtime.sendMessage( { action: 'popout', data: true }, checkError );
@@ -572,11 +594,28 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 				transitionendHandler.coolTimer = setTimeout( () => transitionendHandler.readyToExecute = true, 500 );
 				return true;
 			} transitionendHandler.readyToExecute = true;
-
+			async function mouseHandler( e ) {
+				const { type } = e;
+				console.purple( type );
+				switch ( type ) {
+					case 'mouseup':
+						if ( tc.eventTracker.resizing ) {
+							tc.eventTracker.resizing = false;
+							let trg = e.target.querySelector( `ytd-player video` );
+							await updateControllerCoordinatesWhenUntransformed( trg );
+							restoreTransformedPlayer( trg );
+							return trg;
+						}
+						break;
+					case 'mousedown':
+				}
+			}
 			async function windowResizeHandler( e ) {
-				let trg = e.target.document.querySelector( `ytd-player video` );
-				let video = await updateControllerCoordinatesWhenUntransformed( trg );
-				return video;
+				tc.eventTracker.resizing = true;
+				console.violetBg( `Window innerWidth: ${ window.innerWidth }px` );
+				// let trg = e.target.document.querySelector( `ytd-player video` );
+				// let video = await updateControllerCoordinatesWhenUntransformed( trg );
+				// return video;
 			}
 			function messageHandler( e ) { }
 
@@ -790,10 +829,10 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 				 * this needs to be separated from "untransformPlayer()" in order to have better control, when ad-videos will untransform;
 				 */
 				video ??= document.querySelector( 'ytd-player video' );
-				if ( !video ) return;
+				if ( !video || !video.style || !video.classList ) return;
 				let priorTransform = video.style?.transform || null;
-				if ( !priorTransform && video.classList.contains( 'transform' ) ) untransformPlayer( video ); //this occurs when YouTube Ads interfere //removes all 'transform' class
-				[ 'primary', 'player' ].forEach( id => {
+				if ( !priorTransform && video.classList?.contains( 'transform' ) ) untransformPlayer( video ); //this occurs when YouTube Ads interfere //removes all 'transform' class
+				[ 'primary', 'player', 'movie_player' ].forEach( id => {
 					let element = document.getElementById( id );
 					if ( element ) element.classList.add( 'transform' );
 				} );
@@ -808,7 +847,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 					rescale, Δx, Δy, rescaleW, rescaleH,
 					video: { width, height, videoWidth, videoHeight },
 					viewport: { innerWidth, innerHeight, outerWidth, outerHeight, offsetWidth, offsetHeight }
-				 };
+				};
 				// tc.transform.video = { width, height, videoWidth, videoHeight };
 				// tc.transform.viewport = { innerWidth, innerHeight, outerWidth, outerHeight, offsetWidth, offsetHeight };
 
@@ -1002,7 +1041,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 				if ( e ) targetController = e.target.getRootNode().host;
 				cachedMediaElements.forEach( v => run.execute( v, action, value, e, targetController ) ); //run.execute( action, value, e, v, targetController ) );
 			}
-			run.execute = function( v, action, value, e, targetController ) {
+			run.execute = function ( v, action, value, e, targetController ) {
 				var controller = v?.transform?.div;
 				if ( e && targetController !== controller ) return; //this should be the proper way to compare nodes
 				if ( v.classList.contains( `transform-cancelled` ) ) return;
@@ -1026,30 +1065,29 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 					case `drag`: handleDrag( v, e ); break;
 				}
 			}
-			async function experiment(video, value ) {
+			async function experiment( video, value ) {
 				let stored;
-				switch (value.toString()) {
-					case 'default': browser.runtime.sendMessage( { action: 'popup', data: true } );break;
-					case '2': STORAGE.clear(); console.red('cleared storage'); break;
+				switch ( value.toString() ) {
+					case 'default': browser.runtime.sendMessage( { action: 'popup', data: true } ); break;
+					case '2': STORAGE.clear(); console.red( 'cleared storage' ); break;
 					case '3': STORAGE.set( storageCache.settings ); console.pink( 'set storage' ); break;
 					case '4': console.green( ( await STORAGE.get() ).stringify( 4 ) ); break;
 					case '5': console.orange( storageCache.stringify( 4 ) ); break;
 					case '6': storageCache = resetStorageCache(); console.pink( storageCache.stringify( 4 ) ); break;
 				}
 			}
-			async function updateViewport( specifier ) {
-				let msg = { action: '', data: '' };
-				switch ( specifier ) {
-					case 'shrink':
-						msg.action = 'updateWindowSizeLocation';
-						console.blueBg( tc.transform.stringify( 4 ) )
-						const { rescale, video, viewport } = tc.transform;
-						let deltaWidth = ( parseInt( viewport.innerWidth ) - parseFloat( rescale ) * parseInt( video.width ) );
-						let deltaHeight = ( parseInt( viewport.innerHeight ) - parseFloat( rescale ) * parseInt( video.height ) );
-						msg.data = { deltaWidth: parseInt( -deltaWidth ), deltaHeight: parseInt( -deltaHeight ), deltaLeft: parseInt( deltaWidth / 2 ), deltaTop: parseInt( deltaHeight / 2 ) }
-						let response = await browser.runtime.sendMessage( msg, checkError );
-						break;
-					case 'expand': console.log( 'expanding viewport not impolemented' ); break
+			async function updateViewport( videoElement, specifier ) {
+				if ( !videoElement?.classList.contains( 'transform' ) ) return;
+				let msg = { action: 'updateWindowSizeLocation', data: '' };
+				const { rescale, video, viewport } = tc.transform;
+				let deltaWidth = ( parseInt( viewport.innerWidth ) - parseFloat( rescale ) * parseInt( video.width ) );
+				let deltaHeight = ( parseInt( viewport.innerHeight ) - parseFloat( rescale ) * parseInt( video.height ) );;
+				msg.data = { deltaWidth: parseInt( -deltaWidth ), deltaHeight: parseInt( -deltaHeight ), deltaLeft: parseInt( deltaWidth / 2 ), deltaTop: parseInt( deltaHeight / 2 ) }
+				let response = await browser.runtime.sendMessage( msg, checkError );
+				if ( response ) { //temp solution
+					setTimeout( () => { restoreTransformedPlayer( videoElement ) }, 500 )
+				} else {
+					setTimeout( () => { restoreTransformedPlayer( videoElement ) }, 500 )
 				}
 			}
 			function checkError( msg ) {
@@ -1096,7 +1134,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 
 
 
-//!! these are not working
+			//!! these are not working
 
 			if ( !HTMLVideoElement.prototype.hasOwnProperty( 'modifiedPlay' ) ) {
 				Object.defineProperty( HTMLVideoElement.prototype, "modifiedPlay", {
@@ -1111,7 +1149,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 					if ( !video.transform ) video.transform = new tc.transformController( video );
 					else {
 						controller = video.transform.div;
-						if (controller.classList.contains("transform-nosource")) controller.classList.remove( "transform-nosource" );
+						if ( controller.classList.contains( "transform-nosource" ) ) controller.classList.remove( "transform-nosource" );
 					}
 					return ret;
 				} )( HTMLVideoElement.prototype.play );
@@ -1121,7 +1159,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 				Object.defineProperty( HTMLMediaElement.prototype, "modifiedPlay", {
 					value: true
 				} )
-				console.blueBg('modify .play()');
+				console.blueBg( 'modify .play()' );
 				HTMLMediaElement.prototype.play = ( originalFunction => function play() {
 					const video = this;
 					const ret = originalFunction.apply( video, arguments );
@@ -1141,6 +1179,6 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 
 
 
-		});
+		} );
 	} );
 } );

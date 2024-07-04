@@ -3,7 +3,7 @@
 import * as monkeypatch from "./lib/monkeypatch_prototypes/monkeypatch.mjs";
 [ 'consoleColors', 'stringify', 'is', 'defer' ].forEach( patch => monkeypatch[ patch ]() );
 if ( `undefined` == typeof globalThis.browser ) globalThis.browser = chrome;
-
+var displays;
 browser.runtime.onMessage.addListener( messageHandler );
 async function messageHandler(msg, sender, sendResponse) {
 	// const tabId = sender.tab.id;
@@ -15,9 +15,11 @@ async function messageHandler(msg, sender, sendResponse) {
 	// console.blueBg(msg.stringify(4), sender.stringify(4))
 	switch(action) {
 		case 'updateWindowSizeLocation':
+			// displays ??= await browser.system.display.getInfo();
+			const { workArea } = await getDisplay(win);
 			const {deltaLeft, deltaTop, deltaWidth, deltaHeight} = data;
-			let specs = {left: left+deltaLeft, top: top+deltaTop, width: width+deltaWidth, height: height+deltaHeight}
-			console.redBg(specs.stringify(4))
+			let specs = {left: Math.min(Math.max(left+deltaLeft, workArea.left), workArea.left + workArea.width), top: Math.min(Math.max(top+deltaTop, workArea.top), workArea.top + workArea.height), width: Math.min(width+deltaWidth, workArea.width), height: Math.min(height+deltaHeight, workArea.height)}
+			console.redBg(specs.stringify(4), deltaWidth, deltaHeight)
 			browser.windows.update( browser.windows.WINDOW_ID_CURRENT, specs ); break;
 			// win = browser.windows.getCurrent();
 		case 'popout':
@@ -28,6 +30,40 @@ async function messageHandler(msg, sender, sendResponse) {
 			console.log( 'Popup' );
 			tab = await getCurrentTab();
 		setViewPort(tab, 'popup', data); break;
+	}
+}
+
+async function getDisplay( win ) {
+	/**
+	 * this works. Will be used to resize/relocate based on the originating monitor.
+	 * sometimes the origin (top, left) can be outside of both monitor, need to handle this case too
+	 */
+	if ( win.windowId ) win = await browser.windows.get( win.windowId ); //this is when tab is passed in
+	displays ??= await ( browser.system || chrome.system ).display.getInfo();
+	const { left: l, top: t, width: w, height: h } = win;
+	const r = l + w, b = t + h;
+	const floor = Math.floor;
+	return (
+		checkCorners( t + floor( h / 2 ), l + floor( w / 2 ), 'center of page' ) ||
+		checkCorners( t, l, 'top-left corner' ) ||
+		checkCorners( b, r, 'bottom-right corner' ) ||
+		checkCorners( b, l, 'bottom-left corner' ) ||
+		checkCorners( t, r, 'top-right corner' ) ||
+		displays[ 0 ] //defaults to primary monitor if all else failed
+	);
+
+	function checkCorners( horizontalBorder, verticalBorder, note ) {
+		for ( let index in displays ) {
+			displays[ index ].index = index;
+			const { left, top, width, height } = displays[ index ].workArea;
+			const right = left + width, bottom = top + height;
+			// let winHorizontalBorder = ( top + displayOffset.top <= horizontalBorder && horizontalBorder < bottom ) ? index : NaN;
+			let winHorizontalBorder = ( top <= horizontalBorder && horizontalBorder < bottom ) ? index : NaN;
+			// let winVerticalBorder = ( left + displayOffset.left <= verticalBorder && verticalBorder < right ) ? index : NaN;
+			let winVerticalBorder = ( left  <= verticalBorder && verticalBorder < right ) ? index : NaN;
+			if ( winVerticalBorder === winHorizontalBorder ) return displays[ index ];
+		}
+		return null;
 	}
 }
 

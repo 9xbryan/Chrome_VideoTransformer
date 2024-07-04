@@ -1,24 +1,16 @@
 body.transform {
-	overflow: hidden; /* Hide scrollbars */
-	overflow-y: hidden; /* Hide vertical scrollbar */
-	overflow-x: hidden; /* Hide horizontal scrollbar */
+	overflow: hidden; /* Hide scrollbars, weird approach but it works */
 }
-#container.transform,
-#primary.transform,
-#player.transform {
-	position: fixed !important;
+#container.transform {
+	position: fixed;
 	top: 0 !important;
 	left: 0 !important;
 	width: 100% !important;
 	height: 100% !important;
-	z-index: 99999999 !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	background-color: rgba(1, 1, 36, .85);
-}
-DIV.ytp-chrome-bottom.transform {
-	width: 100% !important;
-	left: 0 !important;
+	z-index: 99999999;
+	margin: 0;
+	padding: 0;
+	background-image: linear-gradient(to bottom right, rgba(1, 117, 53, 0.125), rgba(0, 25, 25, 1));
 }
 .transform-nosource,
 .transform-hidden {
@@ -42,7 +34,6 @@ DIV.ytp-chrome-bottom.transform {
 }
 .ytp-autohide .transform-controller {
 	visibility: hidden;
-	/* visibility:visible; */
 	transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	opacity: 0;
 }
@@ -50,11 +41,36 @@ DIV.ytp-chrome-bottom.transform {
 	visibility: visible;
 	opacity: 1;
 }
-
 .ytp-autohide.hideControlsWhenPaused, .ytp-autohide .hideControlsWhenPaused, .hideControlsWhenPaused {
 	display:none;
 	visibility: hidden;
-	/* visibility:visible; */
 	transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	opacity: 0;
+}
+/*this works -- just need to unify some settings under ".transform" */
+/* DIV.ytp-chrome-bottom.transform {
+	width: 100% !important;
+	left: 0 !important;
+} */
+/*experimentals for youtube*/
+.transform .ytp-gradient-bottom, .transform .ytp-gradient-top {
+	width: 100%;
+	/* height: 100% !important; */
+	transition: opacity .1s cubic-bezier(.4,0,1,1);
+	-webkit-transition: opacity .1s cubic-bezier(.4,0,1,1);
+	background-repeat: repeat-x;
+	pointer-events:none;
+}
+.transform .ytp-chrome-bottom {
+	width: 96% !important; /* it appears left: is natively calculated to be 2% of player width */
+	left: 2% !important;
+	/* transform: translateX(50%) !important; */
+	/* left: -50% !important; */
+}
+.transform .ytp-progress-bar-container, .transform .ytp-progress-chapters-container {
+	position: fixed !important;
+	width: 100% !important; /* it appears left: is natively calculated to be 2% of player width */
+}
+VIDEO.transform {
+	box-shadow: rgba(250, 250, 250, 0.634) 0px 1px 4px;
 }
