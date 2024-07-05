@@ -1,4 +1,43 @@
 'use strict';
+// const requireWorker = new Worker( "./lib/standard/require.js" ); //!doesn't work
+// const myWorker = new SharedWorker( "worker.js" ); //!doesn't work
+// importScripts('./lib/standard/require.js'); //!importScripts() is not allowed
+import { requirejs, require, define } from "./lib/standard/require.js"; //green: modified
+// const require = REQUIREJS.require;
+// require( { baseUrl: "./" }, [ "require", "simple", "anon/blue", "func", "anon/green" ],
+// function ( require, simple, blue, func, green ) {
+// 		postMessage( simple.color );
+// 		postMessage( green.name );
+// 		postMessage( func() );
+// 		postMessage( blue.name );
+// 	}
+// );
+requirejs.config( {
+	//By default load any module IDs from js/lib
+	baseUrl: './',
+	//except, if the module ID starts with "app",
+	//load it from the js/app directory. paths
+	//config is relative to the baseUrl, and
+	//never includes a ".js" extension since
+	//the paths config could be for a directory.
+	paths: {
+		action: './actionPopup',
+		icons: './icons',
+		monkeypatch: 'lib/monkeypatch_prototypes',
+		options:'./options'
+	}
+} );
+
+/**
+ * !!doesn't work, but synchronous importing is not important at this time in the background service worker.
+ */
+// Start the main app logic.
+// requirejs( [ 'monkeypatch/monkeypatch' ],
+// 	function ( monkeypatch ) {
+// 		monkeypatch[ 'consoleColors' ]();
+// 		//jQuery, canvas and the app/sub module are all
+// 		//loaded and can be used here now.
+// 	} );
 
 import * as monkeypatch from "./lib/monkeypatch_prototypes/monkeypatch.mjs";
 [ 'consoleColors', 'stringify', 'is', 'defer' ].forEach( patch => monkeypatch[ patch ]() );

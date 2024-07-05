@@ -1,6 +1,68 @@
+
 if ( `undefined` == typeof globalThis.browser ) globalThis.browser = chrome;
+// var require = {
+// 	deps: [ "some/module1", "my/module2", "a.js", "b.js" ],
+// 	callback: function ( module1, module2 ) {
+// 		//This function will be called when all the dependencies
+// 		//listed above in deps are loaded. Note that this
+// 		//function could be called before the page is loaded.
+// 		//This callback is optional.
+// 	}
+// // };
+// requirejs.config(
+// 	{
+// 		baseUrl: browser.runtime.getURL( './' ),
+// 		paths: {
+// 			monkeypatch: browser.runtime.getURL( './lib/monkeypatch_prototypes' ),
+// 			standard: browser.runtime.getURL( './lib/standard' ),
+// 		},
+// 		waitSeconds: 15
+// 	}
+// )
+
+// /**
+//  * & https://requirejs.org/docs/api.html#usage
+//  */
+// requirejs( [ browser.runtime.getURL( './lib/standard/require.min.js' ) ], function () {
+// 	requirejs( [ 'monkeypatch/monkeypatch_RequireJS', 'monkeypatch/monkeypatch_DOM_RequireJS' ], function ( monkeypatch, monkeypatch_DOM ) {
+// 		// [ 'consoleColors', 'stringify', 'is', 'defer' ].forEach( patch => {
+// 		// 	console.log( `using RequrieJS: before running: monkeypatch.${ patch }();` );
+// 		// 	globalThis[ patch ]();
+// 		// 	console.log( `using RequrieJS: after running: monkeypatch.${ patch }();` );
+// 		// } );
+// 		// [ consoleColors, stringify, is, defer ].forEach( patch => {
+// 		// 	console.log( `using RequrieJS: before running: monkeypatch.${ patch }();` );
+// 		// 	monkeypatch.patch();
+// 		// 	console.log( `using RequrieJS: after running: monkeypatch.${ patch }();` );
+// 		// } );
+// 		if ( monkeypatch ) console.log( Object.keys( monkeypatch ).toString() );
+// 		if ( monkeypatch_DOM ) console.log( Object.keys( monkeypatch_DOM ).toString() );
+// 		if ( monkeypatch) {
+// 			console.log( 'monkeypatch exists' )
+// 			monkeypatch.is();
+// 		} else console.log( 'monkeypatch doesnt exist' );
+// 		// }else {
+// 		// 	console.log('no monkeypatch object');
+// 		// 	// test.testFunction();
+// 		// 	if (typeof exportedModule !== 'undefined' )exportedModule();
+// 		// }
+// 		// define(["monkeypatch/test"], function (test) {
+// 		// 	console.log(test)
+// 		// });
+// 		console.log( 'done importing monkeypatch, and monkeypatch_DOM.js' )
+// 	} )
+// } )
+
+
+
+
+
 import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" ) ).then( monkeypatch => {
-	[ 'consoleColors', 'stringify', 'is', 'defer' ].forEach( patch => monkeypatch[ patch ]() );
+	[ 'consoleColors', 'stringify', 'is', 'defer' ].forEach( patch => {
+		// console.violetBg(`using import(): before running: monkeypatch.${patch}();`);
+		monkeypatch[ patch ]();
+		// console.violetBg( `using import(): after running: monkeypatch.${ patch }();` );
+	} );
 	import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch_DOM.mjs" ) ).then( monkeypatch_DOM => {
 		[ 'ShadowRootTraverse', 'eventListeners', 'preventDefault', 'keyboardEventProperties', 'patchingHTMLElements' ].forEach( patch => monkeypatch_DOM[ patch ]() );
 		import( browser.runtime.getURL( "./modifyVideoPrototypeForTransform.mjs" ) ).then( async videoModules => {
@@ -300,6 +362,9 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 						video.classList.add( 'paused' );
 						hideControlsWhenPaused( video );
 						break;
+					case 'ended':
+						video.classList.add( 'paused' );
+						untransformPlayer(video);break;
 					default:
 						video.classList.add( type );
 				}
@@ -1074,6 +1139,7 @@ import( browser.runtime.getURL( "./lib/monkeypatch_prototypes/monkeypatch.mjs" )
 					case '4': console.green( ( await STORAGE.get() ).stringify( 4 ) ); break;
 					case '5': console.orange( storageCache.stringify( 4 ) ); break;
 					case '6': storageCache = resetStorageCache(); console.pink( storageCache.stringify( 4 ) ); break;
+					case '7': window.open( browser.runtime.getURL( "./options/options.html" ), "_blank" );break;
 				}
 			}
 			async function updateViewport( videoElement, specifier ) {

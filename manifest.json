@@ -40,7 +40,11 @@
 				"https://meet.google.com/*"
 			],
 			"css": ["transformer.css"],
-			"js": ["transformer_cs.js"]
+			"js": [
+				// "lib/standard/require.min.js",
+				// "lib/monkeypatch_prototypes/main.js",
+				"transformer_cs.js"
+			]
 		}
 	],
 	"web_accessible_resources": [
@@ -48,8 +52,15 @@
 			"resources": [
 				"transformer.css",
 				"shadow.css",
+				"options/options.html",
+				// "lib/monkeypatch_prototypes/test.js",
 				"lib/monkeypatch_prototypes/monkeypatch.mjs",
 				"lib/monkeypatch_prototypes/monkeypatch_DOM.mjs",
+				// "lib/monkeypatch_prototypes/monkeypatch_RequireJS.js",
+				// "lib/monkeypatch_prototypes/monkeypatch_DOM_RequireJS.js",
+				// "lib/monkeypatch_prototypes/main.js",
+				// "lib/monkeypatch_prototypes/dependency1.js",
+				// "lib/standard/require.min.js",
 				"modifyVideoPrototypeForTransform.mjs"
 			],
 			"matches": ["http://*/*", "https://*/*", "file:///*"]
