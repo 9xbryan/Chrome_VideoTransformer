@@ -57,7 +57,27 @@
 					<option value="true">Disable website key bindings</option>
 				</select>
 			</div>
-
+			<div class="row customs" id="transformEscape">
+				<select class="customAction">
+					<option value="transform">Escape Transformation</option>
+				</select>
+				<input
+					class="customKey"
+					type="text"
+					value=""
+					placeholder="press a key" />
+				<input
+					disabled
+					class="customValue"
+					type="text"
+					value="escape" />
+				<select class="customForce">
+					<option value="false">
+						Do not disable website key bindings
+					</option>
+					<option value="true">Disable website key bindings</option>
+				</select>
+			</div>
 			<div class="row customs" id="transformFit">
 				<select class="customAction">
 					<option value="transform">Fit to viewport</option>
@@ -229,9 +249,9 @@
 			</div>
 
 			<div class="row">
-				<label for="autoTransformWhenPlay">Autotransform when media plays</label>
-				<input id="autoTransformWhenPlay" type="checkbox" />
-				<select id='autoTransformWhenPlay_options' disabled>
+				<label for="restoreTransformWhenPlay">Autotransform when media plays</label>
+				<input id="restoreTransformWhenPlay" type="checkbox" />
+				<select id='restoreTransformWhenPlay_options' disabled>
 					<option value="fit" default>Fit</option>
 					<option value="fill" default>Fill</option>
 					<option value="stretch" default>Stretch</option>

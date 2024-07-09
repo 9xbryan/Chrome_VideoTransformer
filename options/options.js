@@ -10,7 +10,7 @@ function resetStorageCache() {
 		count: 0, initialized: false,
 		settings: {
 			autoTransformFitWhenPlay: false,
-			autoTransformWhenPlay: 'fit',
+			restoreTransformWhenPlay: 'fit',
 			enabled: true, // default enabled
 			displayKey: 'u', // default: u
 			imageBoolean: false, // default: false
@@ -255,9 +255,10 @@ function recordKeyPress( e ) {
 		e.stopPropagation();
 	} else if ( key === 'Backspace' || keyCode === 8 ) {// Clear input when backspace pressed
 		e.target.value = "";
-	} else if ( key === 'Escape' || keyCode === 27 ) {// When esc pressed, clear input
-		trg.value = trg.key || '';
 	}
+	// else if ( key === 'Escape' || keyCode === 27 ) {// When esc pressed, clear input
+	// 	trg.value = trg.key || '';
+	// }
 }
 
 function inputFilterNumbersOnly( e ) {
@@ -375,8 +376,8 @@ function save_options() {
 		console.log(id, element.checked, element.value);
 		storageCache.settings[ id ] = element.value === 'on' ? element.checked : element.value;
 	} );
-	const autoTransform = document.getElementById( 'autoTransformWhenPlay' );
-	storageCache.settings[ 'autoTransformWhenPlay' ] = autoTransform.checked ? document.getElementById( 'autoTransformWhenPlay_options').value : false;
+	const autoTransform = document.getElementById( 'restoreTransformWhenPlay' );
+	storageCache.settings[ 'restoreTransformWhenPlay' ] = autoTransform.checked ? document.getElementById( 'restoreTransformWhenPlay_options').value : false;
 	keyBindings = [];
 	Array.from( document.querySelectorAll( ".customs" ) ).forEach( item => createKeyBindings( item ) );
 	storageCache.settings.keyBindings = keyBindings;
@@ -391,10 +392,10 @@ async function update_options(data) {
 		if ( typeof data[ id ] === 'boolean' ) document.getElementById( id ).checked = data[ id ];
 		else document.getElementById( id ).value = data[ id ];
 	} );
-	if ( data.autoTransformWhenPlay ) {
-		document.getElementById( 'autoTransformWhenPlay' ).checked = true;
-		const autoTransfrom_options = document.getElementById( 'autoTransformWhenPlay_options' );
-		autoTransfrom_options.value = data.autoTransformWhenPlay;
+	if ( data.restoreTransformWhenPlay ) {
+		document.getElementById( 'restoreTransformWhenPlay' ).checked = true;
+		const autoTransfrom_options = document.getElementById( 'restoreTransformWhenPlay_options' );
+		autoTransfrom_options.value = data.restoreTransformWhenPlay;
 		autoTransfrom_options.disabled = false;
 	}
 
