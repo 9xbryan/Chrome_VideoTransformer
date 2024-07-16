@@ -409,6 +409,8 @@ function initialize( browser ) {
 				break;
 			case 'ended':
 				video.classList.add( 'paused' );
+				tc.states.transformed = '';
+				tc.states.flipped = '';
 				untransformPlayer( video ); break;
 			default:
 				video.classList.add( type ); break;
@@ -800,6 +802,7 @@ function initialize( browser ) {
 
 		const resizeObserver = new ResizeObserver( resizeObserverHandler );
 		resizeObserver.observe( document.documentElement );
+		resizeObserver.observe( document.body );
 	}
 	async function resizeObserverHandler( entries ) {
 		/**
@@ -810,7 +813,7 @@ function initialize( browser ) {
 			let { width, left } = entry.contentRect;
 			// console.green( `bodyWidth: ${ width }px` );
 			tc.eventTracker.resizing = true;
-			restoreTransformedPlayer( entry.target?.querySelector( `ytd-player video` ) );
+			restoreTransformedPlayer( tc.transform.video ||entry.target?.querySelector( `ytd-player video` ) );
 			if ( resizeObserverHandler.readyToExecute ) {
 				resizeObserverHandler.readyToExecute = false;
 				// console.greenBg( `bodyWidth: ${ width }px` );
@@ -1024,7 +1027,7 @@ function initialize( browser ) {
 		video ??= document.querySelector( `ytd-player video` );
 		if ( !tc.states.transformed && !tc.states.flipped ) untransformPlayer( video );
 		else {
-			transformPlayer( video, tc.states.transformed );
+			transformPlayer( video, tc.states.transformed, tc.states.flipped );
 		}
 
 	}
@@ -1165,7 +1168,7 @@ function initialize( browser ) {
 		let className = mode, top = 0, left = 0;
 		switch ( mode ) {
 			case 'fit':
-			case 'fill': newTransformValue = `translate(${ Δx }px, ${ Δy }px) scale(${ flip?.includes( 'X' ) ? "-" : '' }${ rescale }, ${ flip?.includes( 'Y' ) ? "-" : '' }${ rescale });`; break;
+			case 'fill': newTransformValue = `translate(${ Δx-1 }px, ${ Δy-1 }px) scale(${ flip?.includes( 'X' ) ? "-" : '' }${ rescale + 0.015 }, ${ flip?.includes( 'Y' ) ? "-" : '' }${ rescale + 0.015 });`; break;
 			case 'stretch': newTransformValue = `translate(${ Δx }px, ${ Δy }px) scale(${ flip?.includes( 'X' ) ? "-" : '' }${ rescaleW }, ${ flip?.includes( 'Y' ) ? "-" : '' }${ rescaleH });`; break;
 		}
 
@@ -1173,7 +1176,7 @@ function initialize( browser ) {
 
 		// video.style.transform = videoTransform;
 		video.classList.remove( ...classesToRemove );
-		if ( flip ) video.classList.add( mode );
+		if ( mode ) video.classList.add( mode );
 		if ( flip ) video.classList.add( `flip` + flip );
 		let results = await updateDynamicTransformStyle( className, newTransformValue, top, left, 'fixed' );
 
@@ -1401,8 +1404,12 @@ function initialize( browser ) {
 		browser.runtime.sendMessage( msg, response => {
 			if ( browser.runtime.lastError ) console.log( response );
 
-			transformPlayer( video, 'stretch' );
-			tc.states.transformed = currentState;
+			setTimeout(() => {
+				transformPlayer( video, tc.states.transformed, tc.states.flipped );
+			},500)
+
+
+			// tc.states.transformed = currentState;
 		} );
 
 	}
@@ -1452,43 +1459,43 @@ function initialize( browser ) {
 
 	//!! these are not working
 
-	if ( !HTMLVideoElement.prototype.hasOwnProperty( 'modifiedPlay' ) ) {
-		Object.defineProperty( HTMLVideoElement.prototype, "modifiedPlay", {
-			value: true
-		} )
-		console.blueBg( 'modified HTMLVideoElement .play()' );
-		HTMLVideoElement.prototype.play = ( originalFunction => function play() {
-			const video = this;
-			const ret = originalFunction.apply( video, arguments );
-			console.blue( 'HTMLVideoElement.play() called.' );
+	// if ( !HTMLVideoElement.prototype.hasOwnProperty( 'modifiedPlay' ) ) {
+	// 	Object.defineProperty( HTMLVideoElement.prototype, "modifiedPlay", {
+	// 		value: true
+	// 	} )
+	// 	console.blueBg( 'modified HTMLVideoElement .play()' );
+	// 	HTMLVideoElement.prototype.play = ( originalFunction => function play() {
+	// 		const video = this;
+	// 		const ret = originalFunction.apply( video, arguments );
+	// 		console.blue( 'HTMLVideoElement.play() called.' );
 
-			if ( !video.transform ) video.transform = new tc.transformController( video );
-			else {
-				controller = video.transform.div;
-				if ( controller.classList.contains( "transform-nosource" ) ) controller.classList.remove( "transform-nosource" );
-			}
-			return ret;
-		} )( HTMLMediaElement.prototype.play || HTMLVideoElement.prototype.play );
-	}
+	// 		if ( !video.transform ) video.transform = new tc.transformController( video );
+	// 		else {
+	// 			controller = video.transform.div;
+	// 			if ( controller.classList.contains( "transform-nosource" ) ) controller.classList.remove( "transform-nosource" );
+	// 		}
+	// 		return ret;
+	// 	} )( HTMLMediaElement.prototype.play || HTMLVideoElement.prototype.play );
+	// }
 
-	if ( !HTMLMediaElement.prototype.hasOwnProperty( 'modifiedPlay' ) ) {
-		Object.defineProperty( HTMLMediaElement.prototype, "modifiedPlay", {
-			value: true
-		} )
-		console.blueBg( 'modified HTMLMediaElement .play()' );
-		HTMLMediaElement.prototype.play = ( originalFunction => function play() {
-			const video = this;
-			const ret = originalFunction.apply( video, arguments );
-			console.blue( 'HTMLMediaElement.play() called.' );
+	// if ( !HTMLMediaElement.prototype.hasOwnProperty( 'modifiedPlay' ) ) {
+	// 	Object.defineProperty( HTMLMediaElement.prototype, "modifiedPlay", {
+	// 		value: true
+	// 	} )
+	// 	console.blueBg( 'modified HTMLMediaElement .play()' );
+	// 	HTMLMediaElement.prototype.play = ( originalFunction => function play() {
+	// 		const video = this;
+	// 		const ret = originalFunction.apply( video, arguments );
+	// 		console.blue( 'HTMLMediaElement.play() called.' );
 
-			if ( !video.transform ) video.transform = new tc.transformController( video );
-			else {
-				controller = video.transform.div;
-				if ( controller.classList.contains( "transform-nosource" ) ) controller.classList.remove( "transform-nosource" );
-			}
-			return ret;
-		} )( HTMLMediaElement.prototype.play || HTMLVideoElement.prototype.play );
-	}
+	// 		if ( !video.transform ) video.transform = new tc.transformController( video );
+	// 		else {
+	// 			controller = video.transform.div;
+	// 			if ( controller.classList.contains( "transform-nosource" ) ) controller.classList.remove( "transform-nosource" );
+	// 		}
+	// 		return ret;
+	// 	} )( HTMLMediaElement.prototype.play || HTMLVideoElement.prototype.play );
+	// }
 }
 
 
@@ -1519,7 +1526,7 @@ function initialize( browser ) {
 		[ 'ShadowRootTraverse', 'eventListeners', 'preventDefault', 'keyboardEventProperties', 'patchingHTMLElements' ].forEach( patch => {
 			function execute() {
 				if ( mkp_DOM[ patch ] && mkp_DOM[ patch ] instanceof Function ) mkp_DOM[ patch ]();
-				else setTimeout( execute, 1000 );
+				else setTimeout( execute, 1000 ); //this seems to solve the issue
 			}
 
 			execute(); //weird sometimes this get ''Uncaught (in promise) TypeError: MONKEYPATCH[patch] is not a function''

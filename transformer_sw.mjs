@@ -9,7 +9,35 @@ import * as monkeypatch from "./lib/monkeypatch_prototypes/monkeypatch.mjs";
 
 (async function initialize(browser) {
 	var displays;
+	// browser.runtime.onInstalled.addListener(installedHandler);
 	browser.runtime.onMessage.addListener( messageHandler );
+	async function executeScripts() {
+		let results = await browser.scripting.executeScript({
+			target: {},
+
+		})
+	}
+	// var rule1 = {
+	// 	conditions: [
+	// 		new chrome.declarativeContent.PageStateMatcher( {
+	// 			pageUrl: { schemes: [ 'https' ] },
+	// 			css: [ "video" ]
+	// 		} )
+	// 	],
+	// 	actions: [ chrome.declarativeContent.requestContentScript( {
+	// 		allFrames: true,
+	// 		css: [ 'transformer.css' ],
+	// 		js: [ 'transformer_cs.js' ],
+	// 		matchAboutBlank: false
+	// 	} ) ]
+	// };
+	// function installedHandler( details ) {
+	// 	//Rules persist across browsing sessions; therefore, during extension installation time you should first use removeRules to clear previously installed rules and then use addRules to register new ones.
+
+	// 	chrome.declarativeContent.onPageChanged.removeRules( undefined, function () {
+	// 		chrome.declarativeContent.onPageChanged.addRules( [ rule1 ] );
+	// 	} );
+	// }
 	async function messageHandler( msg, sender, sendResponse ) {
 		// const tabId = sender.tab.id;
 		const { windowId, id: tabId } = sender.tab
@@ -116,4 +144,14 @@ import * as monkeypatch from "./lib/monkeypatch_prototypes/monkeypatch.mjs";
 			} ).catch( e => { console.log( "caught error at browser.windows.create:", e ); return reject( e ) } );;
 		} ).catch( e => { return e } );
 	}
+	// let rule2 = {
+	// 	conditions: [
+	// 		new chrome.declarativeContent.PageStateMatcher( {
+	// 			pageUrl: { hostSuffix: '.google.com', schemes: [ 'https' ] },
+	// 			css: [ "input[type='password']" ]
+	// 		} )
+	// 	],
+	// 	actions: [ new chrome.declarativeContent.ShowAction(), new chrome.declarativeContent.setIcon() ]
+	// };
+
 })(globalThis.browser || chrome);

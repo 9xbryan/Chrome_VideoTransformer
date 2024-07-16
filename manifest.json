@@ -12,7 +12,7 @@
 		"48": "icons/48.png",
 		"128": "icons/128.png"
 	},
-	"permissions": ["storage","system.display"],
+	"permissions": ["storage","system.display", "declarativeContent"],
 	"options_ui": {
 		"page": "./options/options.html",
 		"open_in_tab": true
@@ -32,8 +32,8 @@
 	"content_scripts": [
 		{
 			"all_frames": true,
-			"matches": ["http://*/*", "https://*/*", "file:///*"],
-			"match_about_blank": true,
+			"matches": [ "https://*.youtube.com/*"],
+			"match_about_blank": false,
 			"exclude_matches": [
 				"https://plus.google.com/hangouts/*",
 				"https://hangouts.google.com/*",
@@ -53,14 +53,8 @@
 				"transformer.css",
 				"shadow.css",
 				"options/options.html",
-				// "lib/monkeypatch_prototypes/test.js",
 				"lib/monkeypatch_prototypes/monkeypatch.mjs",
 				"lib/monkeypatch_prototypes/monkeypatch_DOM.mjs",
-				// "lib/monkeypatch_prototypes/monkeypatch_RequireJS.js",
-				// "lib/monkeypatch_prototypes/monkeypatch_DOM_RequireJS.js",
-				// "lib/monkeypatch_prototypes/main.js",
-				// "lib/monkeypatch_prototypes/dependency1.js",
-				// "lib/standard/require.min.js",
 				"modifyVideoPrototypeForTransform.mjs"
 			],
 			"matches": ["http://*/*", "https://*/*", "file:///*"]
